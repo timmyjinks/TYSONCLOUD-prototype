@@ -1,0 +1,10 @@
+# Python
+bin/
+pyvenv.cfg
+lib/
+lib64
+include/
+
+
+# Svelte
+bun.lockb
