@@ -1,22 +1,41 @@
 <script lang="ts">
-  import {page} from "$app/state"
   import Button from "$lib/components/Button.svelte"
-</script>
+import {goto} from "$app/navigation"
+  
+async function createContainer(e: SubmitEvent) {
+  const form = e.currentTarget as HTMLFormElement
+  const formData = new FormData(form)
 
+
+  const name = formData.get("name")
+  const image = formData.get("image")
+  const data = {"name": name, "image": image};
+
+
+  await fetch("http://localhost:8000/containers", 
+    {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(data)
+    }  
+  )
+
+  goto("/containers")
+}
+</script>
 
 <section class="w-[80%] m-auto mt-[20px]">
  <b><h1 class="text-[1.5rem] m-[15px]">Create Container</h1></b>
-  <form class="border p-[15px]" action="">
-  <label for="name">Container Name: </label>
-  <input id="name" class="border w-[80%] m-[15px]" type='text' placeholder="e.g. Nextjs App"><br>
+  <form on:submit|preventDefault={createContainer} class="w-[100%] border border-[#272727] p-[15px]" action="http://localhost:8000/containers">
+  <div class="flex items-center justify-evenly">
+  <label class="text-nowrap" for="name">Container Name:</label>
+  <input id="name" name="name" class="w-[100%] bg-[#272727] m-[15px]" type='text' placeholder="e.g. Nextjs App"><br>
+  </div>
+  <div class="flex items-center">
   <label for="image">Image: </label>
-  <input class="border w-[80%] m-[15px]" id="image" type='text' placeholder="e.g. my-image:my-tag"><br>
+  <input class="w-[100%] bg-[#272727] m-[15px]" id="image" name="image" type='text' placeholder="e.g. my-image:my-tag"><br>
+  </div>
   <Button content="Create Container"/>
   </form>
-
-
-
-
-
   </section>
 
