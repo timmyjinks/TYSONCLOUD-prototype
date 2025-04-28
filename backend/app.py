@@ -1,10 +1,12 @@
-import json
+import hashlib
 from typing import Union
 
 import docker
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+from tunnel import *
 
 client = docker.from_env()
 
@@ -83,8 +85,11 @@ def get_container_info():
 @app.post("/containers")
 def create_container(container: CreateContainer):
     try:
-        client.containers.run(image=container.image, name=container.name, detach=True)
-        print("cook")
+        hashed_object = hashlib.sha256(container.name.encode())
+        hashed_name = hashed_object.hexdigest()
+        hashed_name = "mangomongo" + "-" + container.name
+        create_public_url(hashed_name)
+        client.containers.run(image=container.image, name=hashed_name, detach=True)
         return Response(status_code=200)
     except NameError:
         return Response(status_code=500)
@@ -92,10 +97,16 @@ def create_container(container: CreateContainer):
 
 @app.put("/container")
 def update_container(container: UpdateContainer):
-    update = client.containers.get(container.name)
-    update.rename(container.new_name)
-    update.restart()
-    print("update container")
+    try:
+        hashed_object = hashlib.sha256(container.name.encode())
+        hashed_name = hashed_object.hexdigest()
+        hashed_name = hashed_name + "-" + container.new_name
+        update = client.containers.get(container.name)
+        update.rename(hashed_name)
+        update.restart()
+        return Response(status_code=200)
+    except NameError:
+        return Response(status_code=500)
 
 
 @app.delete("/container")
