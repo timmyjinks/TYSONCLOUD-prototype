@@ -12,7 +12,7 @@ async function createContainer(e: SubmitEvent) {
   const data = {"name": name, "image": image};
 
 
-  await fetch("http://localhost:8000/containers", 
+  await fetch("/api/containers/create", 
     {
       method: "POST",
       headers: {"Content-Type": "application/json"},

@@ -16,7 +16,7 @@ async function updateContainer(e: SubmitEvent) {
   const image = formData.get("image")
   const data = {"name": $seletectedContainer.name, "new_name": new_name, "image": image};
 
-  await fetch("http://localhost:8000/container", 
+  await fetch(`/api/container/${name}`, 
     {
       method: "PUT",
       headers: {"Content-Type": "application/json"},
@@ -28,7 +28,7 @@ async function updateContainer(e: SubmitEvent) {
 
 
 async function deleteContainer() {
-  await fetch("http://localhost:8000/container",
+  await fetch(`/api/container/${name}`,
     {
       method: "DELETE",
       headers: {
