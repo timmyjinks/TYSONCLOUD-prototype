@@ -1,15 +1,27 @@
 ---
 services:
   frontend:
-    container_name: "TYSONCLOUD-frontent"
+    container_name: "TYSONCLOUD-frontend"
     build: "./frontend"
-    ports:
-      - "3000:3000"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.tysoncloud-frontend-http.rule=Host("tysoncloud-frontend.home.tysonjenkins.dev")
+      - traefik.http.routers.tysoncloud-frontend-http.entrypoints=web
+      - traefik.http.routers.tysoncloud-frontend-https.tls=true
+      - traefik.http.routers.tysoncloud-frontend-https.tls.certresolver=cloudflare
+      - traefik.http.routers.tysoncloud-frontend-https.entrypoints=websecure
+      - traefik.http.routers.tysoncloud-frontend-https.rule=Host("tysoncloud-frontend.home.tysonjenkins.dev") || Host("tysoncloud-frontend.tysonjenkins.dev")
 
   backend:
     container_name: "TYSONCLOUD-backend"
     build: "./backend"
-    ports:
-      - "8000:8000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.tysoncloud-backend-http.rule=Host("tysoncloud-backend.home.tysonjenkins.dev")
+      - traefik.http.routers.tysoncloud-backend-http.entrypoints=web
+      - traefik.http.routers.tysoncloud-backend-https.tls=true
+      - traefik.http.routers.tysoncloud-backend-https.tls.certresolver=cloudflare
+      - traefik.http.routers.tysoncloud-backend-https.entrypoints=websecure
+      - traefik.http.routers.tysoncloud-backend-https.rule=Host("tysoncloud-backend.home.tysonjenkins.dev")
