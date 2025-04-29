@@ -12,7 +12,11 @@ client = docker.from_env()
 
 app = FastAPI()
 app.add_middleware(
-    CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -46,12 +50,19 @@ class DeleteContainer(BaseModel):
 def get_containers(query: str | None = None):
     try:
         containers = client.containers.list(all=True)
+        if len(containers) == 0:
+            return Response(status_code=500)
         response = []
+        image = ""
         for container in containers:
+            if len(container.image.attrs["RepoTags"]) == 0:
+                image = "name"
+            else:
+                image = container.image.attrs["RepoTags"][0]
             contain = Container(
                 id=container.id,
                 name=container.name,
-                image=container.image.attrs["RepoTags"][0],
+                image=image,
                 info=Info(status=container.status),
             )
             response.append(contain)
@@ -89,7 +100,9 @@ def create_container(container: CreateContainer):
         hashed_name = hashed_object.hexdigest()
         hashed_name = "mangomongo" + "-" + container.name
         create_public_url(hashed_name)
-        client.containers.run(image=container.image, name=hashed_name, detach=True)
+        containe = client.containers.run(
+            image=container.image, name=hashed_name, detach=True
+        )
         return Response(status_code=200)
     except NameError:
         return Response(status_code=500)
