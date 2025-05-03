@@ -14,7 +14,7 @@ async function updateContainer(e: SubmitEvent) {
 
   const new_name = formData.get("new_name")
   const image = formData.get("image")
-  const data = {"name": $seletectedContainer.name, "new_name": new_name, "image": image};
+  const data = {"id": $seletectedContainer.id, "new_name": new_name, "image": image};
 
   await fetch(`/api/container/${name}`, 
     {
