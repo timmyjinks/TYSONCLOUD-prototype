@@ -1,5 +1,4 @@
 import hashlib
-from typing import Union
 
 import docker
 from fastapi import FastAPI, Response
@@ -20,6 +19,13 @@ app.add_middleware(
 )
 
 
+def hash_name(name: str):
+    hashed_object = hashlib.sha256(name.encode())
+    hashed_name = hashed_object.hexdigest()
+    hashed_name = "mangomongo" + "-" + name
+    return hashed_name
+
+
 class Info(BaseModel):
     status: str
 
@@ -37,7 +43,7 @@ class CreateContainer(BaseModel):
 
 
 class UpdateContainer(BaseModel):
-    name: str
+    id: str
     new_name: str
     image: str
 
@@ -51,18 +57,14 @@ def get_containers(query: str | None = None):
     try:
         containers = client.containers.list(all=True)
         if len(containers) == 0:
-            return Response(status_code=500)
+            return []
+
         response = []
-        image = ""
         for container in containers:
-            if len(container.image.attrs["RepoTags"]) == 0:
-                image = "name"
-            else:
-                image = container.image.attrs["RepoTags"][0]
             contain = Container(
                 id=container.id,
                 name=container.name,
-                image=image,
+                image=container.image.attrs["RepoTags"][0],
                 info=Info(status=container.status),
             )
             response.append(contain)
@@ -96,13 +98,12 @@ def get_container_info():
 @app.post("/containers")
 def create_container(container: CreateContainer):
     try:
-        hashed_object = hashlib.sha256(container.name.encode())
-        hashed_name = hashed_object.hexdigest()
-        hashed_name = "mangomongo" + "-" + container.name
+        if container.name == "" or container.image == "":
+            return
+
+        hashed_name = hash_name(container.name)
         create_public_url(hashed_name)
-        containe = client.containers.run(
-            image=container.image, name=hashed_name, detach=True
-        )
+        client.containers.run(image=container.image, name=hashed_name, detach=True)
         return Response(status_code=200)
     except NameError:
         return Response(status_code=500)
@@ -111,12 +112,17 @@ def create_container(container: CreateContainer):
 @app.put("/container")
 def update_container(container: UpdateContainer):
     try:
-        hashed_object = hashlib.sha256(container.name.encode())
-        hashed_name = hashed_object.hexdigest()
-        hashed_name = hashed_name + "-" + container.new_name
-        update = client.containers.get(container.name)
-        update.rename(hashed_name)
-        update.restart()
+        if container.new_name == "" and container.image == "":
+            return
+
+        data = client.containers.get(container.id)
+
+        if data.name is not None:
+            hashed_name = hash_name(data.name)
+            update_public_url(hashed_name, data.name)
+
+            data.rename(hashed_name)
+            data.restart()
         return Response(status_code=200)
     except NameError:
         return Response(status_code=500)
@@ -125,9 +131,10 @@ def update_container(container: UpdateContainer):
 @app.delete("/container")
 def delete_container(container: DeleteContainer):
     try:
-        response = client.containers.get(container.id)
-        response.stop()
-        response.remove()
+        data = client.containers.get(container.id)
+        delete_public_url(data.name)
+        data.stop()
+        data.remove()
         return Response(status_code=200)
     except NameError:
         print(NameError)
