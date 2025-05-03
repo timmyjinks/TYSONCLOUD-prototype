@@ -3,70 +3,121 @@ import os
 from cloudflare import Cloudflare
 from dotenv import load_dotenv
 
-# fix retrieving record ids for deletion
-
 load_dotenv()
 
-cloudflare_token = os.getenv("CLOUDFLARE_API_TOKEN")
-tunnel_id = os.getenv("TUNNEL_ID")
-account_id = os.getenv("ACCOUNT_ID")
-zone_id = os.getenv("ZONE_ID")
+cloudflare_token = os.getenv("CLOUDFLARE_API_TOKEN", "")
+tunnel_id = os.getenv("TUNNEL_ID", "")
+account_id = os.getenv("ACCOUNT_ID", "")
+zone_id = os.getenv("ZONE_ID", "")
 
 
 cf = Cloudflare(api_token=cloudflare_token)
 
 
+def update_public_url(new_name, name):
+    dns_record_id = cf.dns.records.list(zone_id=zone_id, search=name).result[0].id
+    cf.dns.records.update(
+        dns_record_id=dns_record_id,
+        zone_id=zone_id,
+        name=new_name,
+        type="CNAME",
+        content=f"{tunnel_id}.cfargotunnel.com",
+        proxied=True,
+    )
+
+    tunnel = cf.zero_trust.tunnels.cloudflared.configurations.get(
+        tunnel_id=tunnel_id, account_id=account_id
+    )
+
+    if tunnel is None:
+        return
+    if tunnel.config is None:
+        return
+    if tunnel.config.ingress is None:
+        return
+
+    ingress = tunnel.config.ingress
+    fallback = ingress.pop()
+
+    updated_ingress = []
+    for public_hostname in ingress:
+        if public_hostname.hostname != f"{name}.tysonjenkins.dev":
+            updated_ingress.append(public_hostname)
+
+    updated_ingress.append(
+        {
+            "hostname": f"{new_name}.tysonjenkins.dev",
+            "service": f"https://{new_name}.home.tysonjenkins.dev",
+        }
+    )
+
+    updated_ingress.append(fallback)
+    data = {"config": {"ingress": updated_ingress}}
+
+    cf.zero_trust.tunnels.cloudflared.configurations.update(
+        tunnel_id=tunnel_id, account_id=account_id, **data
+    )
+
+
 def delete_public_url(name):
     try:
-        config = cf.zero_trust.tunnels.cloudflared.configurations.get(
-            account_id=account_id,
-            tunnel_id=tunnel_id,
-        )
-
-        ingress = []
-        for public_hostname in config.config.ingress:
-            if (
-                public_hostname.hostname != None
-                and public_hostname.hostname != f"{name}.tysonjenkins.dev"
-            ):
-                ingress.append(public_hostname)
-
-        ingress.append({"service": "http_status:404"})
-
-        new_config = {"config": {"ingress": ingress}}
-
-        cf.zero_trust.tunnels.cloudflared.configurations.update(
-            tunnel_id=tunnel_id,
-            account_id=account_id,
-            **new_config,
-        )
-
-        dns_records = cf.dns.records.list(zone_id=zone_id)
-        dns_record_id = ""
-        for record in dns_records:
-            if record.name == f"{name}.tysonjenkins.dev":
-                dns_record_id = record.id
-                break
+        dns_record_id = cf.dns.records.list(zone_id=zone_id, search=name).result[0].id
 
         cf.dns.records.delete(
             zone_id=zone_id,
             dns_record_id=dns_record_id,
         )
+
+        tunnel = cf.zero_trust.tunnels.cloudflared.configurations.get(
+            account_id=account_id,
+            tunnel_id=tunnel_id,
+        )
+
+        if tunnel is None:
+            return
+        if tunnel.config is None:
+            return
+        if tunnel.config.ingress is None:
+            return
+
+        ingress = tunnel.config.ingress
+        fallback = ingress.pop()
+
+        updated_ingress = []
+        for public_hostname in ingress:
+            if public_hostname.hostname != f"{name}.tysonjenkins.dev":
+                updated_ingress.append(public_hostname)
+
+        updated_ingress.append(fallback)
+
+        data = {"config": {"ingress": updated_ingress}}
+
+        cf.zero_trust.tunnels.cloudflared.configurations.update(
+            tunnel_id=tunnel_id,
+            account_id=account_id,
+            **data,
+        )
+
     except NameError:
         print(NameError)
 
 
 def create_public_url(name):
     try:
-        config = cf.zero_trust.tunnels.cloudflared.configurations.get(
+        tunnel = cf.zero_trust.tunnels.cloudflared.configurations.get(
             account_id=account_id,
             tunnel_id=tunnel_id,
         )
 
-        ingress = []
-        for public_hostname in config.config.ingress:
-            if public_hostname.hostname != None:
-                ingress.append(public_hostname)
+        if tunnel is None:
+            return
+        if tunnel.config is None:
+            return
+        if tunnel.config.ingress is None:
+            return
+
+        ingress = tunnel.config.ingress
+        fallback = ingress.pop()
 
         ingress.append(
             {
@@ -74,15 +125,12 @@ def create_public_url(name):
                 "service": f"https://{name}.home.tysonjenkins.dev",
             }
         )
+        ingress.append(fallback)
 
-        ingress.append({"service": "http_status:404"})
-
-        new_config = {"config": {"ingress": ingress}}
+        data = {"config": {"ingress": ingress}}
 
         cf.zero_trust.tunnels.cloudflared.configurations.update(
-            tunnel_id=tunnel_id,
-            account_id=account_id,
-            **new_config,
+            tunnel_id=tunnel_id, account_id=account_id, **data
         )
 
         cf.dns.records.create(
