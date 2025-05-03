@@ -103,7 +103,18 @@ def create_container(container: CreateContainer):
 
         hashed_name = hash_name(container.name)
         create_public_url(hashed_name)
-        client.containers.run(image=container.image, name=hashed_name, detach=True)
+        labels = [
+            "traefik.enable=true",
+            f"traefik.http.routers.{hashed_name}-http.rule=Host('{hashed_name}.home.tysonjenkins.dev')",
+            "traefik.http.routers.{hashed_name}-http.entrypoints=web",
+            "traefik.http.routers.{hashed_name}-https.tls=true",
+            "traefik.http.routers.{hashed_name}-https.tls.certresolver=cloudflare",
+            "traefik.http.routers.{hashed_name}-https.entrypoints=websecure",
+            f"traefik.http.routers.{hashed_name}-https.rule=Host('{hashed_name}.home.tysonjenkins.dev') || Host('{hashed_name}.tysonjenkins.dev')",
+        ]
+        client.containers.run(
+            image=container.image, name=hashed_name, detach=True, labels=labels
+        )
         return Response(status_code=200)
     except NameError:
         return Response(status_code=500)
@@ -116,13 +127,25 @@ def update_container(container: UpdateContainer):
             return
 
         data = client.containers.get(container.id)
+        image = data.image
 
-        if data.name is not None:
-            hashed_name = hash_name(data.name)
+        if data.name and image is not None:
+            hashed_name = hash_name(container.new_name)
             update_public_url(hashed_name, data.name)
-
-            data.rename(hashed_name)
-            data.restart()
+            data.stop()
+            data.remove()
+            labels = [
+                "traefik.enable=true",
+                f"traefik.http.routers.{hashed_name}-http.rule=Host('{hashed_name}.home.tysonjenkins.dev')",
+                "traefik.http.routers.{hashed_name}-http.entrypoints=web",
+                "traefik.http.routers.{hashed_name}-https.tls=true",
+                "traefik.http.routers.{hashed_name}-https.tls.certresolver=cloudflare",
+                "traefik.http.routers.{hashed_name}-https.entrypoints=websecure",
+                f"traefik.http.routers.{hashed_name}-https.rule=Host('{hashed_name}.home.tysonjenkins.dev') || Host('{hashed_name}.tysonjenkins.dev')",
+            ]
+            client.containers.run(
+                image=image, name=hashed_name, detach=True, labels=labels
+            )
         return Response(status_code=200)
     except NameError:
         return Response(status_code=500)
