@@ -2,26 +2,28 @@
 services:
   frontend:
     container_name: "TYSONCLOUD-frontend"
-    build: "./frontend"
+    image: "timmijinks/tysoncloud-frontend:latest"
+    networks:
+      - frontend
+      - backend
     labels:
       - traefik.enable=true
-      - traefik.http.routers.tysoncloud-frontend-http.rule=Host("tysoncloud-frontend.home.tysonjenkins.dev")
-      - traefik.http.routers.tysoncloud-frontend-http.entrypoints=web
-      - traefik.http.routers.tysoncloud-frontend-https.tls=true
-      - traefik.http.routers.tysoncloud-frontend-https.tls.certresolver=cloudflare
-      - traefik.http.routers.tysoncloud-frontend-https.entrypoints=websecure
-      - traefik.http.routers.tysoncloud-frontend-https.rule=Host("tysoncloud-frontend.home.tysonjenkins.dev") || Host("tysoncloud-frontend.tysonjenkins.dev")
+      - traefik.http.routers.tysoncloud-http.rule=Host("tysoncloud.home.tysonjenkins.dev")
+      - traefik.http.routers.tysoncloud-http.entrypoints=web
+      - traefik.http.routers.tysoncloud-https.tls=true
+      - traefik.http.routers.tysoncloud-https.tls.certresolver=cloudflare
+      - traefik.http.routers.tysoncloud-https.entrypoints=websecure
+      - traefik.http.routers.tysoncloud-https.rule=Host("tysoncloud.home.tysonjenkins.dev")
 
   backend:
     container_name: "TYSONCLOUD-backend"
-    build: "./backend"
+    image: "timmijinks/tysoncloud-backend:latest"
+    networks:
+      - frontend
+      - backend
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - traefik.enable=true
       - traefik.http.routers.tysoncloud-backend-http.rule=Host("tysoncloud-backend.home.tysonjenkins.dev")
       - traefik.http.routers.tysoncloud-backend-http.entrypoints=web
-      - traefik.http.routers.tysoncloud-backend-https.tls=true
-      - traefik.http.routers.tysoncloud-backend-https.tls.certresolver=cloudflare
-      - traefik.http.routers.tysoncloud-backend-https.entrypoints=websecure
-      - traefik.http.routers.tysoncloud-backend-https.rule=Host("tysoncloud-backend.home.tysonjenkins.dev")
