@@ -27,3 +27,13 @@ services:
       - traefik.enable=true
       - traefik.http.routers.tysoncloud-backend-http.rule=Host("tysoncloud-backend.home.tysonjenkins.dev")
       - traefik.http.routers.tysoncloud-backend-http.entrypoints=web
+      - traefik.http.routers.tysoncloud-backend-https.tls=true
+      - traefik.http.routers.tysoncloud-backend-https.tls.certresolver=cloudflare
+      - traefik.http.routers.tysoncloud-backend-https.entrypoints=websecure
+      - traefik.http.routers.tysoncloud-backend-https.rule=Host("tysoncloud-backend.home.tysonjenkins.dev")
+
+networks:
+  frontend:
+    external: true
+  backend:
+    external: true
