@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Build frontend Docker image
-        run: docker build -t timmijinks/tysoncloud-frontend ${{github.workspace}}/frontend
+        run: docker build -t timmijinks/tysoncloud-frontend . --debug
   build-backend:
     runs-on: ubuntu-latest
     defaults:
