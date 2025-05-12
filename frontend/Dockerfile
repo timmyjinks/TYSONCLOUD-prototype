@@ -1,7 +1,7 @@
-FROM oven/bun AS builder
+FROM oven/bun:1 AS builder
 WORKDIR /app
 COPY . .
-RUN bun i
+RUN bun install
 RUN bun run build
 
 FROM oven/bun
