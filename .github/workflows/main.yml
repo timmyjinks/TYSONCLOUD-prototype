@@ -3,22 +3,22 @@ name: Docker build
 on: [push]
 
 jobs: 
-  # build-frontend:
-  #   runs-on: ubuntu-latest
-  #   defaults:
-  #     run:
-  #       shell: bash
-  #       working-directory: ./frontend
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: oven-sh/setup-bun@v2
-  #       with:
-  #         bun-version: latest
+  build-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
       
-  #     - run: bun install ${{github.workspace}}/frontend 
+      - run: bun install
       
-  #     - name: Build frontend Docker image
-  #       run: docker build -t timmijinks/tysoncloud-frontend ${{github.workspace}}/frontend
+      - name: Build frontend Docker image
+        run: docker build -t timmijinks/tysoncloud-frontend ${{github.workspace}}/frontend
   build-backend:
     runs-on: ubuntu-latest
     defaults:
