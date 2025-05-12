@@ -1,4 +1,4 @@
-FROM oven/bun:1 AS builder
+FROM --platform=linux/amd64 oven/bun:1 AS builder
 WORKDIR /app
 COPY . .
 RUN bun install
