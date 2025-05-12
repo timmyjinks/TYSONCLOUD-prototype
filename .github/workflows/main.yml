@@ -11,11 +11,6 @@ jobs:
         working-directory: ./frontend
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-          
-      - run: bun pm cache rm
       
       - name: Build frontend Docker image
         run: docker build -t timmijinks/tysoncloud-frontend ${{github.workspace}}/frontend
