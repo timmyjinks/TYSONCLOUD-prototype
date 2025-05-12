@@ -2,7 +2,7 @@ FROM oven/bun:1 AS builder
 WORKDIR /app
 COPY . .
 RUN bun install
-RUN bun run build
+RUN ls && bun run build
 
 FROM oven/bun
 COPY --from=builder /app/build .
