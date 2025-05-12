@@ -14,7 +14,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      
+          
+      - run: npm set registry https://registry.npmjs.org/
       - run: bun install
       
       - name: Build frontend Docker image
