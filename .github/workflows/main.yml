@@ -13,6 +13,6 @@ jobs:
       #   run: docker build -t timmijinks/tysoncloud-frontend ${{github.workspace}}/frontend
       
       - name: Build backend Docker image
-        run: docker build -t timmijinks/tysoncloud-backend ${{github.workspace}}/frontend
+        run: docker build -t timmijinks/tysoncloud-backend ${{github.workspace}}/backend
     
      
