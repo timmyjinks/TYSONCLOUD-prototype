@@ -6,11 +6,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout code
-        uses: actions/checkout@v4
-  
-      # - name: Build frontend Docker image
-      #   run: docker build -t timmijinks/tysoncloud-frontend ${{github.workspace}}/frontend
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      
+      - name: Build frontend Docker image
+        run: docker build -t timmijinks/tysoncloud-frontend ${{github.workspace}}/frontend
       
       - name: Build backend Docker image
         run: docker build -t timmijinks/tysoncloud-backend ${{github.workspace}}/backend
