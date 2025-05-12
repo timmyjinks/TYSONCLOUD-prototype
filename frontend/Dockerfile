@@ -1,8 +1,8 @@
-FROM --platform=linux/amd64 oven/bun AS builder
+FROM oven/bun AS builder
 WORKDIR /app
 COPY . .
 RUN bun i
-RUN bun vite build
+RUN bun run build
 
 FROM oven/bun
 COPY --from=builder /app/build .
