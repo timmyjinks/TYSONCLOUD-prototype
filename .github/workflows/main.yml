@@ -15,8 +15,7 @@ jobs:
         with:
           bun-version: latest
           
-      - run: npm set registry https://registry.npmjs.org/
-      - run: npm install
+      - run: bun pm cache rm
       
       - name: Build frontend Docker image
         run: docker build -t timmijinks/tysoncloud-frontend ${{github.workspace}}/frontend
