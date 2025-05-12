@@ -11,7 +11,9 @@ jobs:
         with:
           bun-version: latest
       
-      - run: bun install ${{github.workspace}}/frontend       
+      - run: bun install ${{github.workspace}}/frontend   
+      - run: bun build ${{github.workspace}}/frontend  
+      
       - name: Build frontend Docker image
         run: docker build -t timmijinks/tysoncloud-frontend ${{github.workspace}}/frontend
       
