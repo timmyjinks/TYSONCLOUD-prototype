@@ -1,0 +1,17 @@
+name: Docker build
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: cd ./frontend
+      - name: Build frontend Docker image
+        run: docker build -t timmijinks/tysoncloud-frontend .
+
+      - run: cd ../backend
+      - name: Build backend Docker image
+        run: docker build -t timmijinks/tysoncloud-backend .
