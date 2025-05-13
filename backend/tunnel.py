@@ -104,6 +104,14 @@ def delete_public_url(name):
 
 def create_public_url(name):
     try:
+        cf.dns.records.create(
+            zone_id=zone_id,
+            name=name,
+            type="CNAME",
+            content=f"{tunnel_id}.cfargotunnel.com",
+            proxied=True,
+        )
+
         tunnel = cf.zero_trust.tunnels.cloudflared.configurations.get(
             account_id=account_id,
             tunnel_id=tunnel_id,
@@ -133,12 +141,5 @@ def create_public_url(name):
             tunnel_id=tunnel_id, account_id=account_id, **data
         )
 
-        cf.dns.records.create(
-            zone_id=zone_id,
-            name=name,
-            type="CNAME",
-            content=f"{tunnel_id}.cfargotunnel.com",
-            proxied=True,
-        )
     except NameError:
         print(NameError)
