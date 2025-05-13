@@ -20,4 +20,4 @@ jobs:
 
       - name: Build push backend Docker image
         working-directory: ./backend
-        run: docker build -t timmijinks/tysoncloud-backend. && docker push timmijinks/tysoncloud-backend
+        run: docker build -t timmijinks/tysoncloud-backend . && docker push timmijinks/tysoncloud-backend
