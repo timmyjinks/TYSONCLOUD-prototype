@@ -1,0 +1,14 @@
+name: Deployment
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Push docker images
+        run: "docker push timmijnks/tysoncloud-frontend && docker push timmijnks/tysoncloud-backend"
