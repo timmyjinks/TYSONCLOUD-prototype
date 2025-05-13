@@ -102,7 +102,6 @@ def create_container(container: CreateContainer):
             return
 
         hashed_name = hash_name(container.name)
-        create_public_url(hashed_name)
         labels = [
             "traefik.enable=true",
             f"traefik.http.routers.{hashed_name}-http.rule=Host('{hashed_name}.home.tysonjenkins.dev')",
@@ -115,6 +114,7 @@ def create_container(container: CreateContainer):
         client.containers.run(
             image=container.image, name=hashed_name, detach=True, labels=labels
         )
+        create_public_url(hashed_name)
         return Response(status_code=200)
     except NameError:
         return Response(status_code=500)
@@ -131,7 +131,6 @@ def update_container(container: UpdateContainer):
 
         if data.name and image is not None:
             hashed_name = hash_name(container.new_name)
-            update_public_url(hashed_name, data.name)
             data.stop()
             data.remove()
             labels = [
@@ -146,6 +145,7 @@ def update_container(container: UpdateContainer):
             client.containers.run(
                 image=image, name=hashed_name, detach=True, labels=labels
             )
+            update_public_url(hashed_name, data.name)
         return Response(status_code=200)
     except NameError:
         return Response(status_code=500)
@@ -155,9 +155,9 @@ def update_container(container: UpdateContainer):
 def delete_container(container: DeleteContainer):
     try:
         data = client.containers.get(container.id)
-        delete_public_url(data.name)
         data.stop()
         data.remove()
+        delete_public_url(data.name)
         return Response(status_code=200)
     except NameError:
         print(NameError)
