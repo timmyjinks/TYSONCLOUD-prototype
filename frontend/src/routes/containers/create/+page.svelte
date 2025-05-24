@@ -1,8 +1,10 @@
 <script lang="ts">
   import Button from "$lib/components/Button.svelte"
-import {goto} from "$app/navigation"
+  import {goto} from "$app/navigation"
+  let loading = false;
   
 async function createContainer(e: SubmitEvent) {
+  loading = true;
   const form = e.currentTarget as HTMLFormElement
   const formData = new FormData(form)
 
@@ -35,7 +37,11 @@ async function createContainer(e: SubmitEvent) {
   <label for="image">Image: </label>
   <input class="w-[100%] bg-[#272727] m-[15px]" id="image" name="image" type='text' placeholder="e.g. my-image:my-tag"><br>
   </div>
-  <Button content="Create Container"/>
+  {#if loading}
+    <Button loading={loading} content="..."/>
+  {:else}
+    <Button loading={loading}  content="Create Container"/>
+  {/if}
   </form>
   </section>
 

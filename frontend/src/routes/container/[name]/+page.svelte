@@ -6,15 +6,19 @@
   import deletes from "$lib/assests/delete.png"
   const name = page.url.pathname.split("/")[2]
   console.log($seletectedContainer)
+  let loading = $state(false);
 
 async function updateContainer(e: SubmitEvent) {
+  loading = true;
   e.preventDefault()
   const form = e.currentTarget as HTMLFormElement;
   const formData = new FormData(form);
 
   const new_name = formData.get("new_name")
   const image = formData.get("image")
-  const data = {"id": $seletectedContainer.id, "new_name": new_name, "image": image};
+  const update_image = formData.get("update_image") ? true : false;
+  console.log(update_image)
+  const data = {"id": $seletectedContainer?.id, "new_name": new_name, "image": image, "update_image": update_image};
 
   await fetch(`/api/container/${name}`, 
     {
@@ -34,7 +38,7 @@ async function deleteContainer() {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({"id": $seletectedContainer.id})
+      body: JSON.stringify({"id": $seletectedContainer?.id})
     }
   )
   goto("/containers")
@@ -55,8 +59,15 @@ async function deleteContainer() {
   <div class="flex items-center">
   <label class="text-nowrap" for="image">Image: </label>
   <input class="bg-[#272727] w-[100%] m-[15px]" name="image" type='text' placeholder="e.g. my-image:my-tag"><br>
+  <label for="update-image">Update container</label>
+  <input type="checkbox" value=true name="update_image">
   </div>
-  <Button content="Update Container"/>
+
+  {#if loading}
+    <Button loading={loading} content="..."/>
+  {:else}
+    <Button loading={loading}  content="Update Container"/>
+  {/if}
   </form>
   </section>
 
