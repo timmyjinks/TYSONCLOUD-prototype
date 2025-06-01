@@ -5,6 +5,7 @@
   import network from "$lib/assests/network.png"
   import image from "$lib/assests/images.png"
   let {data} = $props()
+console.log(data)
 </script>
 
 <section class="w-[80%] m-auto mt-[20px]">
