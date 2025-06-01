@@ -1,2 +1,2 @@
-import { writable} from "svelte/store"
-export const seletectedContainer = writable(null)
+import { writable } from "svelte/store";
+export let selectedContainer = writable(null);
