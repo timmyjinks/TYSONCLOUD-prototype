@@ -1,11 +1,11 @@
 <script lang="ts">
-  import {seletectedContainer} from "$lib/store"
+  import {selectedContainer} from "$lib/store"
 	import ContainerCard from '$lib/components/ContainerCard.svelte';
   import pihole from "$lib/assests/pihole.svg"
   import Button from "$lib/components/Button.svelte"
   let { data } = $props()
 function update(container) {
-  seletectedContainer.set(container)
+  selectedContainer.set(container)
 }
 </script>
 
