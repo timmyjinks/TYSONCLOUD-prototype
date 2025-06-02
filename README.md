@@ -19,13 +19,13 @@ TYSONCLOUD-prototype is a prototype of TYSONCLOUD that focuses on dynamically de
 
 ### Steps
 1. **Clone the Repository**
-   ```bash
    
+   ```bash
    git clone https://github.com/timmyjinks/TYSONCLOUD-prototype.git
    cd TYSONCLOUD-prototype
    ```
 
-2. **Set Up Environment Variables**
+3. **Set Up Environment Variables**
    Create a `.env` file in the project root and add the following:
    ```plaintext
    
@@ -35,9 +35,9 @@ TYSONCLOUD-prototype is a prototype of TYSONCLOUD that focuses on dynamically de
     ZONE_ID=<your-cloudflared-zone-id>
    ```
 
-3. **Build and Run Docker Containers**
+4. **Build and Run Docker Containers**
+   
    ```bash
-
    docker-compose up --build
    ```
 
@@ -62,8 +62,8 @@ TYSONCLOUD-prototype is a prototype of TYSONCLOUD that focuses on dynamically de
 4. **Verify Deployment**
    - Once deployed, the website is accessible at the provided URL (e.g., `http://localhost:8080`).
    - Check the deployment status in the frontend dashboard or verify running containers using:
-     ```bash
      
+     ```bash
      docker ps
      ```
      
