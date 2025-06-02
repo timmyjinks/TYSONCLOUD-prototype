@@ -5,6 +5,7 @@ from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from gitapi import *
 from tunnel import *
 
 client = docker.from_env()
@@ -40,12 +41,15 @@ class Container(BaseModel):
 class CreateContainer(BaseModel):
     name: str
     image: str
+    github: str
+    enable_github: bool
 
 
 class UpdateContainer(BaseModel):
     id: str
     new_name: str
     image: str
+    update_image: bool
 
 
 class DeleteContainer(BaseModel):
@@ -61,6 +65,7 @@ def get_containers(query: str | None = None):
 
         response = []
         for container in containers:
+            print(container.name)
             contain = Container(
                 id=container.id,
                 name=container.name,
@@ -98,6 +103,10 @@ def get_container_info():
 @app.post("/containers")
 def create_container(container: CreateContainer):
     try:
+        if container.github:
+            build_repository(container.name, container.github)
+            return
+
         if container.name == "" or container.image == "":
             return
 
@@ -128,6 +137,10 @@ def update_container(container: UpdateContainer):
 
         data = client.containers.get(container.id)
         image = data.image
+        print(data.image.attrs["RepoTags"][0])
+
+        if container.update_image == True:
+            client.images.pull(repository=data.image.attrs["RepoTags"][0], tag="latest")
 
         if data.name and image is not None:
             hashed_name = hash_name(container.new_name)
