@@ -31,7 +31,6 @@ TYSONCLOUD-prototype is a prototype of TYSONCLOUD that focuses on dynamically de
     TUNNEL_ID=<your-cloudflared-tunnel-id>
     ACCOUNT_ID=<your-cloudflared-account-id>
     ZONE_ID=<your-cloudflared-zone-id>
-
    ```
 
 3. **Build and Run Docker Containers**
