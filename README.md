@@ -27,15 +27,15 @@ TYSONCLOUD-prototype is a prototype of TYSONCLOUD that focuses on dynamically de
 
 3. **Set Up Environment Variables**
    Create a `.env` file in the project root and add the following:
-   ```plaintext
    
+   ```plaintext
     CLOUDFLARE_API_TOKEN=<your-cloudflared-api-token>
     TUNNEL_ID=<your-cloudflared-tunnel-id>
     ACCOUNT_ID=<your-cloudflared-account-id>
     ZONE_ID=<your-cloudflared-zone-id>
    ```
 
-4. **Build and Run Docker Containers**
+5. **Build and Run Docker Containers**
    
    ```bash
    docker-compose up --build
