@@ -5,6 +5,8 @@ export const actions = {
 		const formData = await request.formData();
 		const name = formData.get('name');
 		const image = formData.get('image');
+    const github = formData('github');
+		const enable_github = formData.get('enable_github');
 
 		const response = await fetch('http://localhost:8000/containers', {
 			method: 'POST',
@@ -12,6 +14,8 @@ export const actions = {
 			body: JSON.stringify({
 				name: name,
 				image: image,
+				github: github,
+				enable_github: enable_github,
 			})
 		});
 
